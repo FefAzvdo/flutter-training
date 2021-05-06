@@ -20,7 +20,7 @@ List<Character> characterList = [];
 
 class _MyHomePageState extends State<MyHomePage> {
   ScrollController _scrollController = new ScrollController();
-  String nextUrl;
+  String nextUrl = "";
 
   @override
   void initState() {
@@ -29,7 +29,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
+              _scrollController.position.maxScrollExtent &&
+          nextUrl != null) {
         getListOfCharactersFromAPI(nextUrl);
       }
     });
@@ -134,6 +135,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     ],
                   ),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
                         child: Center(
