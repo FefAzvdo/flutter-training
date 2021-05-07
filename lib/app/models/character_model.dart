@@ -38,7 +38,7 @@ class Character {
     location =
         json['location'] != null ? new Origin.fromJson(json['location']) : null;
     image = json['image'];
-    episode = json['episode'].cast<String>();
+    episode = json['episode'] != null ? json['episode'].cast<String>() : null;
     url = json['url'];
     created = json['created'];
   }

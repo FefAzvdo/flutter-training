@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_training/app/components/BottomNavigationBarComponent.dart';
 import 'package:flutter_training/app/components/ListCard.dart';
-import 'package:flutter_training/app/models/todo_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_training/app/models/character_model.dart';
@@ -14,42 +13,23 @@ class SearchPage extends StatefulWidget {
 
 Character character;
 List<Character> characterList = [];
+TextEditingController _nameController = TextEditingController();
 
 class _SearchPageState extends State<SearchPage> {
-  ScrollController _scrollController = new ScrollController();
   String nextUrl = "";
 
   @override
   void initState() {
-    getListOfCharactersFromAPI("https://rickandmortyapi.com/api/character");
     super.initState();
-
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-              _scrollController.position.maxScrollExtent &&
-          nextUrl != null) {
-        getListOfCharactersFromAPI(nextUrl);
-      }
-    });
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
     super.dispose();
   }
 
-  Future getSingleCharacterFromAPI() async {
-    var url = "https://rickandmortyapi.com/api/character/2";
-    var response = await http.get(Uri.parse(url));
-    var json = jsonDecode(response.body);
-
-    setState(() {
-      character = Character.fromJson(json);
-    });
-  }
-
-  Future getListOfCharactersFromAPI(String url) async {
+  Future filterCharacterFromAPI(name) async {
+    var url = "https://rickandmortyapi.com/api/character/?name=$name";
     var response = await http.get(Uri.parse(url));
     var jsonArray = jsonDecode(response.body)['results'];
 
@@ -59,7 +39,7 @@ class _SearchPageState extends State<SearchPage> {
         .cast<Character>();
 
     setState(() {
-      characterList = [...characterList, ...modelList];
+      characterList = modelList;
       nextUrl = jsonDecode(response.body)['info']['next'];
     });
   }
@@ -72,22 +52,52 @@ class _SearchPageState extends State<SearchPage> {
           title: Text("Lista de personagens - busca"),
         ),
         body: SingleChildScrollView(
-          child: Container(
-            height: MediaQuery.of(context).size.height,
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: ListView.builder(
-              controller: _scrollController,
-              itemBuilder: (character, index) {
-                return ListTile(
-                  title: ListCard(
-                    character: characterList[index],
-                  ),
-                );
-              },
-              itemCount: characterList.length,
-            ),
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Enter a search term',
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              filterCharacterFromAPI(_nameController.text);
+                            },
+                            icon: Icon(Icons.search),
+                            label: Text("Buscar"),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                height: MediaQuery.of(context).size.height - 280,
+                child: ListView.builder(
+                  itemBuilder: (character, index) {
+                    return ListTile(
+                        title: ListCard(
+                      character: characterList[index],
+                    ));
+                  },
+                  itemCount: characterList.length,
+                ),
+              ),
+            ],
           ),
-          // ),
         ),
         bottomNavigationBar: BottomNavigationBarComponent());
   }
