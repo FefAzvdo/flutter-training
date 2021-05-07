@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_training/app/views/home_page_model.dart';
+import 'package:flutter_training/app/views/home_page_view.dart';
+import 'package:flutter_training/app/views/search_page_view.dart';
 
 void main() {
   runApp(MyApp());
@@ -11,10 +12,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      theme: ThemeData(brightness: Brightness.dark, fontFamily: 'Roboto'),
+      routes: {
+        '/home': (context) => MyHomePage(),
+        '/search': (context) => SearchPage(),
+      },
+      home: MyHomePage(),
     );
   }
 }
